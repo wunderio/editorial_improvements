@@ -1,0 +1,73 @@
+<?php
+/**
+ * @file
+ * Drupal needs this blank file.
+ */
+
+function editorial_improvements_form_node_form_alter(&$form, &$form_state, $form_id) {
+
+  // disable confusing preview button for all users
+  $form['actions']['preview']['#access'] = FALSE;
+  if (isset($form['field_workflow_status'])) {
+    $form['options']['status']['#disabled'] = TRUE;
+    $form['options']['status']['#description'] = t('Publishing is controlled by workflow');
+  }
+
+}
+
+/**
+ * Implements hook_wysiwyg_editor_settings_alter().
+ */
+function editorial_improvements_wysiwyg_editor_settings_alter(&$settings, $context) {
+  // Adjust editor height.
+  $settings['height'] = '600';
+  if ($context['profile']->editor == 'ckeditor') {
+    $settings['stylesCombo_stylesSet'] = 'drupal:'.base_path().
+      drupal_get_path('module', 'editorial_improvements').'/js/ckeditor.styles.js';
+  }
+
+  $settings['toolbar'] = array(
+    array(
+      'Undo',
+      'Redo',
+      'Copy',
+      'Paste',
+      'Cut',
+      'PasteFromWord',
+      'PasteText',
+    ),
+    array (
+      'Bold',
+      'Italic',
+      'Underline',
+      'Strike',
+      'JustifyLeft',
+      'JustifyCenter',
+      'JustifyRight',
+      'BulletedList',
+      'NumberedList',
+    ),
+    array (
+      //'Format',
+      'Styles',
+      'RemoveFormat',
+    ),
+    array(
+      'linkit',
+      'Unlink',
+      'media',
+      'SpecialChar',
+      'Table',
+      'HorizontalRule',
+    ),
+    array(
+      'break',
+      'Source',
+      'Scayt',
+      'SpellChecker',
+      'Maximize',
+    ),
+  );
+}
+
+// END OF FILE marker.
