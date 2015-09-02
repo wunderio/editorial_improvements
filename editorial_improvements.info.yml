@@ -1,0 +1,6 @@
+name: Editorial Improvements
+type: module
+description: Improvements for editorial workflows
+core: 8.x
+package: Other
+

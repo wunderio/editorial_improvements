@@ -1,73 +1,43 @@
 <?php
+
 /**
  * @file
- * Drupal needs this blank file.
+ * Contains editorial_improvements.module.
  */
 
-function editorial_improvements_form_node_form_alter(&$form, &$form_state, $form_id) {
+use Drupal\Core\Routing\RouteMatchInterface;
 
-  // disable confusing preview button for all users
-  $form['actions']['preview']['#access'] = FALSE;
-  if (isset($form['field_workflow_status'])) {
-    $form['options']['status']['#disabled'] = TRUE;
-    $form['options']['status']['#description'] = t('Publishing is controlled by workflow');
+/**
+ * Implements hook_help().
+ */
+function editorial_improvements_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the editorial_improvements module.
+    case 'help.page.editorial_improvements':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Improvements for editorial workflows') . '</p>';
+      return $output;
+
+    default:
   }
-
 }
 
 /**
- * Implements hook_wysiwyg_editor_settings_alter().
+ * Implements hook_editor_js_settings_alter
+ * @param array $settings
  */
-function editorial_improvements_wysiwyg_editor_settings_alter(&$settings, $context) {
-  // Adjust editor height.
-  $settings['height'] = '600';
-  if ($context['profile']->editor == 'ckeditor') {
-    $settings['stylesCombo_stylesSet'] = 'drupal:'.base_path().
-      drupal_get_path('module', 'editorial_improvements').'/js/ckeditor.styles.js';
+function editorial_improvements_editor_js_settings_alter(array &$settings) {
+  if (empty($settings['editor']['formats'])) {
+    return;
   }
 
-  $settings['toolbar'] = array(
-    array(
-      'Undo',
-      'Redo',
-      'Copy',
-      'Paste',
-      'Cut',
-      'PasteFromWord',
-      'PasteText',
-    ),
-    array (
-      'Bold',
-      'Italic',
-      'Underline',
-      'Strike',
-      'JustifyLeft',
-      'JustifyCenter',
-      'JustifyRight',
-      'BulletedList',
-      'NumberedList',
-    ),
-    array (
-      //'Format',
-      'Styles',
-      'RemoveFormat',
-    ),
-    array(
-      'linkit',
-      'Unlink',
-      'media',
-      'SpecialChar',
-      'Table',
-      'HorizontalRule',
-    ),
-    array(
-      'break',
-      'Source',
-      'Scayt',
-      'SpellChecker',
-      'Maximize',
-    ),
-  );
+  foreach ($settings['editor']['formats'] as $format => $setting) {
+    // http://docs.ckeditor.com/#!/api/CKEDITOR.config-cfg-skin
+    // When setting config.skin it is possible to specify custom skin location
+    // after a comma.
+    if ($setting['editor'] == 'ckeditor') {
+      $settings['editor']['formats'][$format]['editorSettings']['skin'] = 'bootstrapck,' . base_path() . 'libraries/ckeditor_skin_bootstrap/';
+    }
+  }
 }
-
-// END OF FILE marker.
